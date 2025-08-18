@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.*;
 @RestController @RequestMapping("/api/auctions")
 public class AuctionController {
     private final AuctionService service;
-    public AuctionController(AuctionService service){ this.service = service; }
+    public AuctionController(AuctionService service){
+        this.service = service; }
 
     @PostMapping
     public ResponseEntity<Auction> create(@RequestBody CreateAuctionRequest req){
