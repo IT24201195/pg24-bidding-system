@@ -20,4 +20,17 @@ public class Auction {
         return (startAt == null || now.isAfter(startAt)) && (endAt == null || now.isBefore(endAt));
     }
     // getters/setters
+    public Long getId() { return id; }
+    public String getTitle() { return title; }
+    public String getDescription() { return description; }
+    public BigDecimal getBasePrice() { return basePrice; }
+    public LocalDateTime getStartAt() { return startAt; }
+    public LocalDateTime getEndAt() { return endAt; }
+
+    public void setTitle(String title) { this.title = title; }
+    public void setDescription(String description) { this.description = description; }
+    public void setBasePrice(BigDecimal basePrice) { this.basePrice = basePrice; }
+    public void setStartAt(LocalDateTime startAt) { this.startAt = startAt; }
+    public void setEndAt(LocalDateTime endAt) { this.endAt = endAt; }
+
 }
