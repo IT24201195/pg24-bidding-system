@@ -1,6 +1,6 @@
 package com.pg24.bidding.auction.controller;
 
-import com.pg24.bidding.auction.dto.AuctionDTOs.CreateAuctionRequest;
+import com.pg24.bidding.auction.dto.CreateAuctionRequest;
 import com.pg24.bidding.auction.model.Auction;
 import com.pg24.bidding.auction.service.AuctionService;
 import org.springframework.http.ResponseEntity;

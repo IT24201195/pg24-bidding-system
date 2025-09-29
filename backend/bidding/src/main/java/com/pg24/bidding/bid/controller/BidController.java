@@ -1,34 +1,35 @@
 package com.pg24.bidding.bid.controller;
 
-import com.pg24.bidding.bid.dto.BidDTOs.PlaceBidRequest;
+import com.pg24.bidding.bid.dto.BidResponse;
+import com.pg24.bidding.bid.dto.PlaceBidRequest;
 import com.pg24.bidding.bid.model.Bid;
 import com.pg24.bidding.bid.repository.BidRepository;
 import com.pg24.bidding.bid.service.BidService;
-import com.pg24.bidding.realtime.HighestBidDTO;
-import com.pg24.bidding.realtime.HighestBidQueryService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@RestController
-@RequestMapping("/api/auctions/{auctionId}")
+import java.util.List;
+
+@RestController @RequestMapping("/api/bids")
 public class BidController {
+
     private final BidService service;
-    private final HighestBidQueryService query;
     private final BidRepository repo;
 
-    public BidController(BidService service, HighestBidQueryService query, BidRepository repo) {
-        this.service = service;
-        this.query = query;
-        this.repo = repo;
+    public BidController(BidService service, BidRepository repo) {
+        this.service = service; this.repo = repo;
     }
 
-    @PostMapping("/bids")
-    public ResponseEntity<Bid> place(@PathVariable Long auctionId, @RequestBody PlaceBidRequest req) {
-        return ResponseEntity.ok(service.place(auctionId, req));
+    @PostMapping("/auction/{auctionId}")
+    public ResponseEntity<BidResponse> place(@PathVariable Long auctionId, @RequestBody PlaceBidRequest req) {
+        Bid b = service.place(auctionId, req.bidderEmail(), req.amount());
+        return ResponseEntity.ok(new BidResponse(
+                b.getId(), b.getAuction().getId(), b.getBidder().getEmail(), b.getAmount(), b.getCreatedAt()
+        ));
     }
 
-    @GetMapping("/highest")
-    public ResponseEntity<HighestBidDTO> highest(@PathVariable Long auctionId){
-        return ResponseEntity.ok(query.currentHighest(auctionId));
+    @GetMapping("/auction/{auctionId}")
+    public List<Bid> list(@PathVariable Long auctionId) {
+        return repo.findByAuction_IdOrderByAmountDesc(auctionId);
     }
 }

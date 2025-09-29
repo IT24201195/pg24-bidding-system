@@ -1,39 +1,19 @@
 package com.pg24.bidding.realtime.service;
 
-import com.pg24.bidding.auction.model.Auction;
-import com.pg24.bidding.auction.repository.AuctionRepository;
-import com.pg24.bidding.bid.model.Bid;
 import com.pg24.bidding.bid.repository.BidRepository;
-import com.pg24.bidding.realtime.dto.HighestBidDTO;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 
 @Service
 public class HighestBidQueryService {
-    private final BidRepository bidRepo;
-    private final AuctionRepository auctionRepo;
+    private final BidRepository bids;
 
-    public HighestBidQueryService(BidRepository bidRepo, AuctionRepository auctionRepo) {
-        this.bidRepo = bidRepo;
-        this.auctionRepo = auctionRepo;
-    }
+    public HighestBidQueryService(BidRepository bids) { this.bids = bids; }
 
-    @Transactional(readOnly = true)
-    public HighestBidDTO currentHighest(Long auctionId) {
-        Auction auction = auctionRepo.findById(auctionId)
-                .orElseThrow(() -> new IllegalArgumentException("Auction not found"));
-
-        var top = bidRepo.findTopByAuctionIdOrderByAmountDesc(auctionId);
-        BigDecimal amount = top.map(Bid::getAmount).orElse(auction.getBasePrice());
-        String masked = top.map(b -> mask(b.getBidderId())).orElse("-");
-        return new HighestBidDTO(auctionId, amount, masked);
-    }
-
-    private String mask(Long bidderId){
-        if (bidderId == null) return "-";
-        String s = bidderId.toString();
-        return "User" + s.charAt(0) + "***" + (bidderId % 10);
+    public BigDecimal currentHighest(Long auctionId) {
+        return bids.findTopByAuction_IdOrderByAmountDesc(auctionId)
+                .map(b -> b.getAmount())
+                .orElse(BigDecimal.ZERO);
     }
 }

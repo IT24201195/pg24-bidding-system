@@ -4,15 +4,16 @@ import com.pg24.bidding.realtime.dto.HighestBidDTO;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
-
 @Component
 public class RealtimePublisher {
-    private final SimpMessagingTemplate messaging;
-    public RealtimePublisher(SimpMessagingTemplate messaging){this.messaging=messaging;}
+    private final SimpMessagingTemplate broker;
 
-    public void publishHighestBid(Long auctionId, BigDecimal amount, String maskedBidder){
-        messaging.convertAndSend("/topic/auction." + auctionId + ".highest",
-                new HighestBidDTO(auctionId, amount, maskedBidder));
+    public RealtimePublisher(SimpMessagingTemplate broker) {
+        this.broker = broker;
+    }
+
+    public void publishHighestBid(Long auctionId, java.math.BigDecimal amount) {
+        broker.convertAndSend("/topic/auctions/" + auctionId + "/highestBid",
+                new HighestBidDTO(auctionId, amount));
     }
 }
