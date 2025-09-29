@@ -14,22 +14,22 @@ public class Bid {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional=false, fetch=FetchType.LAZY)
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
     private Auction auction;
 
     private Long bidderId;
     private BigDecimal amount;
     private LocalDateTime createdAt = LocalDateTime.now();
 
-    public Long getId() { return id; }
-
-    public Auction getAuction() { return auction; }
-    public void setAuction(Auction auction) { this.auction = auction; }
-
-    public java.math.BigDecimal getAmount() { return amount; }
-    public void setAmount(java.math.BigDecimal amount) { this.amount = amount; }
-
-    public java.time.LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(java.time.LocalDateTime createdAt) { this.createdAt = createdAt; }
-// getters/setters
+    // getters/setters
+    public Long getId(){return id;}
+    public void setId(Long id){this.id=id;}
+    public Auction getAuction(){return auction;}
+    public void setAuction(Auction auction){this.auction=auction;}
+    public Long getBidderId(){return bidderId;}
+    public void setBidderId(Long bidderId){this.bidderId=bidderId;}
+    public BigDecimal getAmount(){return amount;}
+    public void setAmount(BigDecimal amount){this.amount=amount;}
+    public LocalDateTime getCreatedAt(){return createdAt;}
+    public void setCreatedAt(LocalDateTime createdAt){this.createdAt=createdAt;}
 }

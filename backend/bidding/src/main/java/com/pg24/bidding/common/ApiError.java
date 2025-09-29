@@ -1,4 +1,3 @@
 package com.pg24.bidding.common;
 
-public class ApiError {
-}
+public record ApiError(String message) {}

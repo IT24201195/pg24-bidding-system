@@ -2,70 +2,45 @@ package com.pg24.bidding.bid.service;
 
 import com.pg24.bidding.auction.model.Auction;
 import com.pg24.bidding.auction.repository.AuctionRepository;
-import com.pg24.bidding.bid.dto.BidResponse;
-import com.pg24.bidding.bid.dto.PlaceBidRequest;
+import com.pg24.bidding.bid.dto.BidDTOs.PlaceBidRequest;
 import com.pg24.bidding.bid.model.Bid;
 import com.pg24.bidding.bid.repository.BidRepository;
-import org.springframework.http.HttpStatus;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+import com.pg24.bidding.realtime.RealtimePublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
-import java.util.Map;
 
 @Service
 public class BidService {
-
-    private final AuctionRepository auctionRepo;
     private final BidRepository bidRepo;
-    private final SimpMessagingTemplate messaging;
+    private final AuctionRepository auctionRepo;
+    private final RealtimePublisher realtime;
 
-    public BidService(AuctionRepository auctionRepo, BidRepository bidRepo, SimpMessagingTemplate messaging) {
-        this.auctionRepo = auctionRepo;
+    public BidService(BidRepository bidRepo, AuctionRepository auctionRepo, RealtimePublisher realtime) {
         this.bidRepo = bidRepo;
-        this.messaging = messaging;
+        this.auctionRepo = auctionRepo;
+        this.realtime = realtime;
     }
 
     @Transactional
-    public BidResponse placeBid(Long auctionId, PlaceBidRequest req) {
-        if (req == null || req.amount() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "AMOUNT_REQUIRED");
-        }
+    public Bid place(Long auctionId, PlaceBidRequest req) {
+        Auction auction = auctionRepo.findById(auctionId).orElseThrow(() -> new IllegalArgumentException("Auction not found"));
+        if (auction.isEnded()) throw new IllegalStateException("Auction ended");
 
-        Auction a = auctionRepo.findById(auctionId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "AUCTION_NOT_FOUND"));
-
-        if (!a.isActive()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "AUCTION_ENDED_OR_INACTIVE");
-        }
-
-        // Highest so far, or base price if no bids yet
-        BigDecimal current = bidRepo.findTopByAuctionIdOrderByAmountDesc(auctionId)
-                .map(Bid::getAmount)
-                .orElse(a.getBasePrice());
-
-        // Must be strictly higher than current
+        BigDecimal current = bidRepo.findCurrentHighestAmount(auctionId, auction.getBasePrice());
         if (req.amount().compareTo(current) <= 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "BID_NOT_HIGHER_THAN_CURRENT");
+            throw new IllegalArgumentException("Bid must be greater than " + current);
         }
 
-        // Save bid
         Bid bid = new Bid();
-        bid.setAuction(a);
+        bid.setAuction(auction);
+        bid.setBidderId(req.bidderId());
         bid.setAmount(req.amount());
-        bid = bidRepo.save(bid);
+        bidRepo.save(bid);
 
-        // Realtime broadcast (for Highest Bid Display)
-        Map<String, Object> payload = Map.of(
-                "amount", bid.getAmount(),
-                "at", bid.getCreatedAt().toString()
-        );
-
-        messaging.convertAndSend("/topic/auctions/" + auctionId + "/highest", (Object) payload);
-
-
-        return new BidResponse(bid.getId(), bid.getAmount(), bid.getCreatedAt());
+        String masked = "User" + req.bidderId().toString().charAt(0) + "***" + (req.bidderId() % 10);
+        realtime.publishHighestBid(auctionId, req.amount(), masked);
+        return bid;
     }
 }
