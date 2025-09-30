@@ -1,71 +1,56 @@
 package com.pg24.bidding.bid.service;
 
+import com.pg24.bidding.auction.controller.AuctionStatus;
 import com.pg24.bidding.auction.model.Auction;
 import com.pg24.bidding.auction.repository.AuctionRepository;
-import com.pg24.bidding.bid.dto.BidResponse;
-import com.pg24.bidding.bid.dto.PlaceBidRequest;
+import com.pg24.bidding.auth.service.AuthService;
 import com.pg24.bidding.bid.model.Bid;
 import com.pg24.bidding.bid.repository.BidRepository;
-import org.springframework.http.HttpStatus;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
+import com.pg24.bidding.realtime.model.RealtimePublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.math.BigDecimal;
-import java.util.Map;
+import java.time.LocalDateTime;
 
 @Service
 public class BidService {
 
-    private final AuctionRepository auctionRepo;
-    private final BidRepository bidRepo;
-    private final SimpMessagingTemplate messaging;
+    private final BidRepository repo;
+    private final AuctionRepository auctions;
+    private final AuthService auth;
+    private final RealtimePublisher rt;
 
-    public BidService(AuctionRepository auctionRepo, BidRepository bidRepo, SimpMessagingTemplate messaging) {
-        this.auctionRepo = auctionRepo;
-        this.bidRepo = bidRepo;
-        this.messaging = messaging;
+    public BidService(BidRepository repo, AuctionRepository auctions, AuthService auth, RealtimePublisher rt) {
+        this.repo = repo;
+        this.auctions = auctions;
+        this.auth = auth;
+        this.rt = rt;
     }
 
     @Transactional
-    public BidResponse placeBid(Long auctionId, PlaceBidRequest req) {
-        if (req == null || req.amount() == null) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "AMOUNT_REQUIRED");
-        }
+    public Bid place(Long auctionId, String bidderEmail, BigDecimal amount) {
+        Auction a = auctions.findById(auctionId)
+                .orElseThrow(() -> new jakarta.persistence.EntityNotFoundException("Auction not found"));
+        if (a.getStatus() != AuctionStatus.ACTIVE) throw new IllegalStateException("Auction not active");
+        var now = LocalDateTime.now();
+        if (a.getStartAt() != null && now.isBefore(a.getStartAt())) throw new IllegalStateException("Auction not started");
+        if (a.getEndAt() != null && now.isAfter(a.getEndAt())) throw new IllegalStateException("Auction ended");
 
-        Auction a = auctionRepo.findById(auctionId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "AUCTION_NOT_FOUND"));
+        BigDecimal min = a.getBasePrice() == null ? BigDecimal.ZERO : a.getBasePrice();
+        var current = repo.findTopByAuction_IdOrderByAmountDesc(auctionId).orElse(null);
+        var increment = a.getMinIncrement() == null ? BigDecimal.valueOf(100) : a.getMinIncrement();
+        if (current != null) min = current.getAmount().add(increment);
 
-        if (!a.isActive()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "AUCTION_ENDED_OR_INACTIVE");
-        }
+        if (amount.compareTo(min) < 0) throw new IllegalStateException("Bid must be >= " + min);
 
-        // Highest so far, or base price if no bids yet
-        BigDecimal current = bidRepo.findTopByAuctionIdOrderByAmountDesc(auctionId)
-                .map(Bid::getAmount)
-                .orElse(a.getBasePrice());
+        var bidder = auth.getByEmail(bidderEmail);
+        Bid b = new Bid();
+        b.setAuction(a); b.setBidder(bidder); b.setAmount(amount); b.setCreatedAt(LocalDateTime.now());
+        repo.save(b);
 
-        // Must be strictly higher than current
-        if (req.amount().compareTo(current) <= 0) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "BID_NOT_HIGHER_THAN_CURRENT");
-        }
-
-        // Save bid
-        Bid bid = new Bid();
-        bid.setAuction(a);
-        bid.setAmount(req.amount());
-        bid = bidRepo.save(bid);
-
-        // Realtime broadcast (for Highest Bid Display)
-        Map<String, Object> payload = Map.of(
-                "amount", bid.getAmount(),
-                "at", bid.getCreatedAt().toString()
-        );
-
-        messaging.convertAndSend("/topic/auctions/" + auctionId + "/highest", (Object) payload);
-
-
-        return new BidResponse(bid.getId(), bid.getAmount(), bid.getCreatedAt());
+        // realtime update for HighestBidWidget
+        rt.publishHighestBid(auctionId, amount);
+        return b;
     }
 }

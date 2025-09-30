@@ -1,4 +1,5 @@
 package com.pg24.bidding.common;
 
-public class ApiError {
-}
+import org.springframework.http.HttpStatus;
+
+public record ApiError(String message, HttpStatus status) {}
