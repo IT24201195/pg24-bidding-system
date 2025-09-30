@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BidMaster Pro - Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+<!-- Navigation Sidebar -->
+<nav class="sidebar">
+    <div class="sidebar-header">
+        <div class="logo">
+            <i class="fas fa-gavel"></i>
+            <span>BidMaster</span>
+        </div>
+        <button class="sidebar-toggle" id="sidebarToggle">
+            <i class="fas fa-bars"></i>
+        </button>
+    </div>
+
+    <div class="sidebar-content">
+        <div class="user-profile">
+            <div class="user-avatar">
+                <i class="fas fa-user"></i>
+            </div>
+            <div class="user-info">
+                <h3 id="userFullName">Loading...</h3>
+                <span class="user-role" id="userRole">Bidder</span>
+            </div>
+        </div>
+
+        <ul class="sidebar-nav">
+            <li class="nav-item active">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-home"></i>
+                    <span>Dashboard</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-hammer"></i>
+                    <span>Active Bids</span>
+                    <span class="badge">5</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-history"></i>
+                    <span>Bid History</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-trophy"></i>
+                    <span>Won Auctions</span>
+                    <span class="badge">12</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#" class="nav-link">
+                    <i class="fas fa-cog"></i>
+                    <span>Settings</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <div class="sidebar-footer">
+        <button class="btn btn-logout" id="logoutBtn">
+            <i class="fas fa-sign-out-alt"></i>
+            <span>Logout</span>
+        </button>
+    </div>
+</nav>
+
+<!-- Main Content -->
+<main class="main-content">
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <h1 class="page-title">Dashboard</h1>
+            <div class="breadcrumb">
+                <span>Home</span>
+                <i class="fas fa-chevron-right"></i>
+                <span class="active">Dashboard</span>
+            </div>
+        </div>
+
+        <div class="header-right">
+            <div class="header-actions">
+                <button class="btn-icon" id="notificationsBtn">
+                    <i class="fas fa-bell"></i>
+                    <span class="notification-badge">3</span>
+                </button>
+                <button class="btn-icon" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+            <div class="current-time" id="currentTime"></div>
+        </div>
+    </header>
+
+    <!-- Alert Container -->
+    <div id="alertContainer"></div>
+
+    <!-- Stats Cards -->
+    <section class="stats-section">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon primary">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="totalUsers">0</h3>
+                    <p>Total Users</p>
+                </div>
+                <div class="stat-trend up">
+                    <i class="fas fa-arrow-up"></i>
+                    12%
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon success">
+                    <i class="fas fa-hammer"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="activeBids">0</h3>
+                    <p>Active Bids</p>
+                </div>
+                <div class="stat-trend up">
+                    <i class="fas fa-arrow-up"></i>
+                    8%
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon warning">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="endingSoon">0</h3>
+                    <p>Ending Soon</p>
+                </div>
+                <div class="stat-trend down">
+                    <i class="fas fa-arrow-down"></i>
+                    3%
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon danger">
+                    <i class="fas fa-trophy"></i>
+                </div>
+                <div class="stat-info">
+                    <h3 id="wonAuctions">0</h3>
+                    <p>Won Auctions</p>
+                </div>
+                <div class="stat-trend up">
+                    <i class="fas fa-arrow-up"></i>
+                    15%
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Users Table Section -->
+    <section class="content-section">
+        <div class="section-header">
+            <h2>Registered Users</h2>
+            <div class="section-actions">
+                <button class="btn btn-secondary" id="refreshUsers">
+                    <i class="fas fa-sync-alt"></i>
+                    Refresh
+                </button>
+                <button class="btn btn-primary" id="exportUsers">
+                    <i class="fas fa-download"></i>
+                    Export
+                </button>
+            </div>
+        </div>
+
+        <div class="table-container">
+            <table class="data-table" id="usersTable">
+                <thead>
+                <tr>
+                    <th>
+                        <div class="table-header">
+                            <span>User ID</span>
+                            <i class="fas fa-sort"></i>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="table-header">
+                            <span>Username</span>
+                            <i class="fas fa-sort"></i>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="table-header">
+                            <span>Email</span>
+                            <i class="fas fa-sort"></i>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="table-header">
+                            <span>Full Name</span>
+                            <i class="fas fa-sort"></i>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="table-header">
+                            <span>Phone</span>
+                            <i class="fas fa-sort"></i>
+                        </div>
+                    </th>
+                    <th>
+                        <div class="table-header">
+                            <span>Joined Date</span>
+                            <i class="fas fa-sort"></i>
+                        </div>
+                    </th>
+                    <th>Actions</th>
+                </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                <!-- Users will be loaded here -->
+                </tbody>
+            </table>
+        </div>
+
+        <div class="table-footer">
+            <div class="table-info">
+                Showing <span id="showingCount">0</span> of <span id="totalCount">0</span> users
+            </div>
+            <div class="pagination" id="pagination">
+                <!-- Pagination will be generated here -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Loading dashboard data...</p>
+        </div>
+    </div>
+</main>
+
+<script src="js/dashboard.js"></script>
+</body>
+</html>
