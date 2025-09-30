@@ -1,5 +1,5 @@
- feat/auth
-package com.bidding.model;
+
+package com.pg24.bidding.auth.model;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -173,4 +173,3 @@ public class User {
     public Set<UserRole> getRoles(){return roles;}
     public void setRoles(Set<UserRole> roles){this.roles=roles;}
 }
- main

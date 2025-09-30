@@ -1,4 +1,4 @@
-package com.bidding.config;
+package com.pg24.bidding.auth.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

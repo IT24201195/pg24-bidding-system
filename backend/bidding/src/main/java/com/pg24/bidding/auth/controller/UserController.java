@@ -1,9 +1,9 @@
-package com.bidding.controller;
+package com.pg24.bidding.auth.controller;
 
 import com.bidding.dto.ApiResponse;
 import com.bidding.dto.LoginRequest;
 import com.bidding.dto.RegisterRequest;
-import com.bidding.model.User;
+import com.pg24.bidding.auth.model.User;
 import com.bidding.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;

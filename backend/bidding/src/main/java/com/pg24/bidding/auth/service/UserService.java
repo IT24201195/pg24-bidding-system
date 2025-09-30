@@ -1,7 +1,7 @@
-package com.bidding.service;
+package com.pg24.bidding.auth.service;
 
-import com.bidding.model.User;
-import com.bidding.repository.UserRepository;
+import com.pg24.bidding.auth.model.User;
+import com.pg24.bidding.auth.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

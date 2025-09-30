@@ -1,4 +1,4 @@
-package com.bidding.controller;
+package com.pg24.bidding.auth.controller;
 
 import com.bidding.dto.ApiResponse;
 import org.springframework.http.ResponseEntity;
