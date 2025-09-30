@@ -30,24 +30,44 @@ public class Auction {
     private Long version;
 
     // getters/setters
-    public Long getId(){return id;}
-    public void setId(Long id){this.id=id;}
-    public User getSeller(){return seller;}
-    public void setSeller(User seller){this.seller=seller;}
-    public String getTitle(){return title;}
-    public void setTitle(String title){this.title=title;}
-    public String getDescription(){return description;}
-    public void setDescription(String description){this.description=description;}
-    public BigDecimal getBasePrice(){return basePrice;}
-    public void setBasePrice(BigDecimal basePrice){this.basePrice=basePrice;}
-    public BigDecimal getMinIncrement(){return minIncrement;}
-    public void setMinIncrement(BigDecimal minIncrement){this.minIncrement=minIncrement;}
-    public LocalDateTime getStartAt(){return startAt;}
-    public void setStartAt(LocalDateTime startAt){this.startAt=startAt;}
-    public LocalDateTime getEndAt(){return endAt;}
-    public void setEndAt(LocalDateTime endAt){this.endAt=endAt;}
-    public AuctionStatus getStatus(){return status;}
-    public void setStatus(AuctionStatus status){this.status=status;}
-    public Long getVersion(){return version;}
-    public void setVersion(Long version){this.version=version;}
+    public Long getId(){
+        return id;}
+    public void setId(Long id){
+        this.id=id;}
+    public User getSeller(){
+        return seller;}
+    public void setSeller(User seller){
+        this.seller=seller;}
+    public String getTitle(){
+        return title;}
+    public void setTitle(String title){
+        this.title=title;}
+    public String getDescription(){
+        return description;}
+    public void setDescription(String description){
+        this.description=description;}
+    public BigDecimal getBasePrice(){
+        return basePrice;}
+    public void setBasePrice(BigDecimal basePrice){
+        this.basePrice=basePrice;}
+    public BigDecimal getMinIncrement(){
+        return minIncrement;}
+    public void setMinIncrement(BigDecimal minIncrement){
+        this.minIncrement=minIncrement;}
+    public LocalDateTime getStartAt(){
+        return startAt;}
+    public void setStartAt(LocalDateTime startAt){
+        this.startAt=startAt;}
+    public LocalDateTime getEndAt(){
+        return endAt;}
+    public void setEndAt(LocalDateTime endAt){
+        this.endAt=endAt;}
+    public AuctionStatus getStatus(){
+        return status;}
+    public void setStatus(AuctionStatus status){
+        this.status=status;}
+    public Long getVersion(){
+        return version;}
+    public void setVersion(Long version){
+        this.version=version;}
 }
