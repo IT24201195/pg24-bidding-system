@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Notifications - Auction System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .notification-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .stats-overview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 30px;
+            background: #f8f9fa;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border-left: 4px solid #3498db;
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card.won {
+            border-left-color: #27ae60;
+        }
+
+        .stat-card.expired {
+            border-left-color: #e74c3c;
+        }
+
+        .stat-card.revenue {
+            border-left-color: #f39c12;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .notification-section {
+            padding: 30px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ecf0f1;
+        }
+
+        .filters {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            background: #ecf0f1;
+            color: #2c3e50;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .filter-btn.active {
+            background: #3498db;
+            color: white;
+        }
+
+        .filter-btn:hover {
+            background: #3498db;
+            color: white;
+        }
+
+        .notifications-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .notification-item {
+            background: white;
+            border: 1px solid #e1e8ed;
+            border-radius: 10px;
+            padding: 20px;
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .notification-item:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateX(5px);
+        }
+
+        .notification-item.unread {
+            border-left: 4px solid #3498db;
+            background: #f8fafc;
+        }
+
+        .notification-item.won {
+            border-left: 4px solid #27ae60;
+        }
+
+        .notification-item.expired {
+            border-left: 4px solid #e74c3c;
+        }
+
+        .notification-item.outbid {
+            border-left: 4px solid #f39c12;
+        }
+
+        .notification-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .icon-won { background: #27ae60; }
+        .icon-expired { background: #e74c3c; }
+        .icon-outbid { background: #f39c12; }
+        .icon-default { background: #3498db; }
+
+        .notification-content {
+            flex: 1;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 5px;
+            font-size: 1.1rem;
+        }
+
+        .notification-message {
+            color: #5d6d7e;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .notification-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85rem;
+            color: #7f8c8d;
+        }
+
+        .notification-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: 1px solid #bdc3c7;
+            border-radius: 15px;
+            background: white;
+            color: #7f8c8d;
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+        }
+
+        .action-btn:hover {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+
+        .action-btn.primary {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+
+        .action-btn.primary:hover {
+            background: #2980b9;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #7f8c8d;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5rem;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+
+        .mark-all-read {
+            text-align: right;
+            margin-bottom: 20px;
+        }
+
+        .mark-all-read-btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background 0.3s ease;
+        }
+
+        .mark-all-read-btn:hover {
+            background: #219a52;
+        }
+
+        .notification-badge {
+            background: #e74c3c;
+            color: white;
+            border-radius: 10px;
+            padding: 2px 8px;
+            font-size: 0.7rem;
+            margin-left: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .stats-overview {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .notification-item {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .notification-meta {
+                justify-content: center;
+            }
+
+            .filters {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="notification-container">
+    <!-- Header Section -->
+    <div class="header">
+        <h1>📨 Seller Notifications</h1>
+        <p>Stay updated with your auction activities and results</p>
+    </div>
+
+    <!-- Statistics Overview -->
+    <div class="stats-overview">
+        <div class="stat-card">
+            <div class="stat-number" id="totalAuctions">12</div>
+            <div class="stat-label">Total Auctions</div>
+        </div>
+        <div class="stat-card won">
+            <div class="stat-number" id="wonAuctions">8</div>
+            <div class="stat-label">Successful Auctions</div>
+        </div>
+        <div class="stat-card expired">
+            <div class="stat-number" id="expiredAuctions">3</div>
+            <div class="stat-label">Expired Auctions</div>
+        </div>
+        <div class="stat-card revenue">
+            <div class="stat-number">$<span id="totalRevenue">2,450</span></div>
+            <div class="stat-label">Total Revenue</div>
+        </div>
+    </div>
+
+    <!-- Notifications Section -->
+    <div class="notification-section">
+        <div class="section-title">
+            Recent Notifications
+            <span class="notification-badge" id="unreadCount">5 unread</span>
+        </div>
+
+        <!-- Filters -->
+        <div class="filters">
+            <button class="filter-btn active" onclick="filterNotifications('all')">All</button>
+            <button class="filter-btn" onclick="filterNotifications('unread')">Unread</button>
+            <button class="filter-btn" onclick="filterNotifications('won')">Auction Won</button>
+            <button class="filter-btn" onclick="filterNotifications('expired')">Auction Expired</button>
+            <button class="filter-btn" onclick="filterNotifications('outbid')">Outbid</button>
+        </div>
+
+        <!-- Mark All Read Button -->
+        <div class="mark-all-read">
+            <button class="mark-all-read-btn" onclick="markAllAsRead()">
+                📬 Mark All as Read
+            </button>
+        </div>
+
+        <!-- Notifications List -->
+        <div class="notifications-list" id="notificationsList">
+            <!-- Notifications will be dynamically loaded here -->
+        </div>
+    </div>
+</div>
+
+<script>
+    // Sample notification data
+    const notifications = [
+        {
+            id: 1,
+            type: 'won',
+            title: 'Auction Completed Successfully!',
+            message: 'Your auction "Vintage Camera Collection" has been sold to User #456 for $150.00',
+            timestamp: '2024-01-15T14:30:00',
+            isRead: false,
+            auctionId: 101,
+            winnerId: 456,
+            winningBid: 150.00
+        },
+        {
+            id: 2,
+            type: 'expired',
+            title: 'Auction Expired',
+            message: 'Your auction "Antique Pocket Watch" has expired without any winning bids',
+            timestamp: '2024-01-15T12:15:00',
+            isRead: false,
+            auctionId: 102
+        },
+        {
+            id: 3,
+            type: 'won',
+            title: 'Congratulations! Auction Sold',
+            message: 'Your auction "Smartphone X Pro" has been sold to User #789 for $320.00',
+            timestamp: '2024-01-14T16:45:00',
+            isRead: true,
+            auctionId: 103,
+            winnerId: 789,
+            winningBid: 320.00
+        },
+        {
+            id: 4,
+            type: 'outbid',
+            title: 'New Highest Bid',
+            message: 'A new highest bid of $85.00 has been placed on your auction "Designer Handbag"',
+            timestamp: '2024-01-14T10:20:00',
+            isRead: false,
+            auctionId: 104,
+            newBid: 85.00
+        },
+        {
+            id: 5,
+            type: 'won',
+            title: 'Auction Successfully Closed',
+            message: 'Your auction "Gaming Laptop" has been sold to User #123 for $650.00',
+            timestamp: '2024-01-13T18:30:00',
+            isRead: true,
+            auctionId: 105,
+            winnerId: 123,
+            winningBid: 650.00
+        },
+        {
+            id: 6,
+            type: 'expired',
+            title: 'Auction Ended',
+            message: 'Your auction "Vintage Books Collection" has ended without any bids',
+            timestamp: '2024-01-13T14:00:00',
+            isRead: true,
+            auctionId: 106
+        }
+    ];
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', function() {
+        loadNotifications();
+        updateStatistics();
+    });
+
+    // Load notifications into the list
+    function loadNotifications(filter = 'all') {
+        const notificationsList = document.getElementById('notificationsList');
+        notificationsList.innerHTML = '';
+
+        let filteredNotifications = notifications;
+
+        if (filter === 'unread') {
+            filteredNotifications = notifications.filter(notification => !notification.isRead);
+        } else if (filter !== 'all') {
+            filteredNotifications = notifications.filter(notification => notification.type === filter);
+        }
+
+        if (filteredNotifications.length === 0) {
+            notificationsList.innerHTML = `
+                    <div class="empty-state">
+                        <div>📭</div>
+                        <h3>No notifications found</h3>
+                        <p>You're all caught up! New notifications will appear here.</p>
+                    </div>
+                `;
+            return;
+        }
+
+        filteredNotifications.forEach(notification => {
+            const notificationElement = createNotificationElement(notification);
+            notificationsList.appendChild(notificationElement);
+        });
+    }
+
+    // Create notification HTML element
+    function createNotificationElement(notification) {
+        const div = document.createElement('div');
+        div.className = `notification-item ${notification.type} ${notification.isRead ? '' : 'unread'}`;
+
+        const iconClass = getIconClass(notification.type);
+        const iconSymbol = getIconSymbol(notification.type);
+        const timeAgo = getTimeAgo(notification.timestamp);
+        const actions = getActions(notification);
+
+        div.innerHTML = `
+                <div class="notification-icon ${iconClass}">${iconSymbol}</div>
+                <div class="notification-content">
+                    <div class="notification-title">${notification.title}</div>
+                    <div class="notification-message">${notification.message}</div>
+                    <div class="notification-meta">
+                        <span>⏰ ${timeAgo}</span>
+                        <span>🆔 Auction #${notification.auctionId}</span>
+                        ${notification.winningBid ? `<span>💰 $${notification.winningBid.toFixed(2)}</span>` : ''}
+                    </div>
+                    ${actions}
+                </div>
+            `;
+
+        // Add click event to mark as read
+        if (!notification.isRead) {
+            div.addEventListener('click', () => markAsRead(notification.id));
+        }
+
+        return div;
+    }
+
+    // Get icon class based on notification type
+    function getIconClass(type) {
+        const iconClasses = {
+            'won': 'icon-won',
+            'expired': 'icon-expired',
+            'outbid': 'icon-outbid'
+        };
+        return iconClasses[type] || 'icon-default';
+    }
+
+    // Get icon symbol based on notification type
+    function getIconSymbol(type) {
+        const iconSymbols = {
+            'won': '💰',
+            'expired': '⏰',
+            'outbid': '⬆️'
+        };
+        return iconSymbols[type] || '📢';
+    }
+
+    // Calculate time ago
+    function getTimeAgo(timestamp) {
+        const now = new Date();
+        const notificationTime = new Date(timestamp);
+        const diffInMinutes = Math.floor((now - notificationTime) / (1000 * 60));
+
+        if (diffInMinutes < 60) {
+            return `${diffInMinutes}m ago`;
+        } else if (diffInMinutes < 1440) {
+            return `${Math.floor(diffInMinutes / 60)}h ago`;
+        } else {
+            return `${Math.floor(diffInMinutes / 1440)}d ago`;
+        }
+    }
+
+    // Get action buttons based on notification type
+    function getActions(notification) {
+        if (notification.type === 'won') {
+            return `
+                    <div class="notification-actions">
+                        <button class="action-btn primary" onclick="contactWinner(${notification.winnerId})">
+                            Contact Winner
+                        </button>
+                        <button class="action-btn" onclick="viewAuction(${notification.auctionId})">
+                            View Details
+                        </button>
+                    </div>
+                `;
+        } else if (notification.type === 'expired') {
+            return `
+                    <div class="notification-actions">
+                        <button class="action-btn primary" onclick="relistAuction(${notification.auctionId})">
+                            Relist Item
+                        </button>
+                        <button class="action-btn" onclick="viewAuction(${notification.auctionId})">
+                            View Details
+                        </button>
+                    </div>
+                `;
+        } else if (notification.type === 'outbid') {
+            return `
+                    <div class="notification-actions">
+                        <button class="action-btn" onclick="viewAuction(${notification.auctionId})">
+                            View Auction
+                        </button>
+                    </div>
+                `;
+        }
+        return '';
+    }
+
+    // Filter notifications
+    function filterNotifications(filter) {
+        // Update active filter button
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+
+        loadNotifications(filter);
+    }
+
+    // Mark notification as read
+    function markAsRead(notificationId) {
+        const notification = notifications.find(n => n.id === notificationId);
+        if (notification && !notification.isRead) {
+            notification.isRead = true;
+            updateStatistics();
+            loadNotifications(); // Reload to reflect changes
+
+            // Show confirmation
+            showToast('Notification marked as read');
+        }
+    }
+
+    // Mark all notifications as read
+    function markAllAsRead() {
+        notifications.forEach(notification => {
+            notification.isRead = true;
+        });
+        updateStatistics();
+        loadNotifications();
+        showToast('All notifications marked as read');
+    }
+
+    // Update statistics
+    function updateStatistics() {
+        const totalAuctions = notifications.length;
+        const wonAuctions = notifications.filter(n => n.type === 'won').length;
+        const expiredAuctions = notifications.filter(n => n.type === 'expired').length;
+        const unreadCount = notifications.filter(n => !n.isRead).length;
+
+        // Calculate total revenue from won auctions
+        const totalRevenue = notifications
+            .filter(n => n.type === 'won' && n.winningBid)
+            .reduce((sum, n) => sum + n.winningBid, 0);
+
+        document.getElementById('totalAuctions').textContent = totalAuctions;
+        document.getElementById('wonAuctions').textContent = wonAuctions;
+        document.getElementById('expiredAuctions').textContent = expiredAuctions;
+        document.getElementById('totalRevenue').textContent = totalRevenue.toLocaleString();
+        document.getElementById('unreadCount').textContent = `${unreadCount} unread`;
+    }
+
+    // Action functions
+    function contactWinner(winnerId) {
+        showToast(`Opening chat with winner #${winnerId}`);
+        // In real implementation, this would open a chat interface
+    }
+
+    function viewAuction(auctionId) {
+        showToast(`Viewing auction #${auctionId}`);
+        // In real implementation, this would navigate to auction details
+    }
+
+    function relistAuction(auctionId) {
+        showToast(`Relisting auction #${auctionId}`);
+        // In real implementation, this would open relist form
+    }
+
+    // Utility function to show toast messages
+    function showToast(message) {
+        // Create toast element
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #27ae60;
+                color: white;
+                padding: 12px 20px;
+                border-radius: 5px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 1000;
+                transition: all 0.3s ease;
+            `;
+        toast.textContent = message;
+
+        document.body.appendChild(toast);
+
+        // Remove toast after 3 seconds
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateX(100%)';
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 300);
+        }, 3000);
+    }
+
+    // Simulate real-time updates (for demo purposes)
+    setInterval(() => {
+        // Randomly add new notifications for demo
+        if (Math.random() < 0.1) { // 10% chance every 10 seconds
+            const newNotification = {
+                id: notifications.length + 1,
+                type: Math.random() > 0.5 ? 'won' : 'outbid',
+                title: Math.random() > 0.5 ? 'New Auction Completed!' : 'New Highest Bid!',
+                message: Math.random() > 0.5 ?
+                    'Your auction has been successfully sold!' :
+                    'Someone placed a higher bid on your auction!',
+                timestamp: new Date().toISOString(),
+                isRead: false,
+                auctionId: Math.floor(Math.random() * 1000) + 200,
+                winningBid: Math.random() > 0.5 ? Math.floor(Math.random() * 500) + 50 : undefined
+            };
+
+            notifications.unshift(newNotification);
+            updateStatistics();
+            loadNotifications();
+
+            // Show notification alert
+            if ('Notification' in window && Notification.permission === 'granted') {
+                new Notification('New Auction Notification', {
+                    body: newNotification.title,
+                    icon: '/favicon.ico'
+                });
+            }
+        }
+    }, 10000);
+
+    // Request notification permission
+    if ('Notification' in window) {
+        Notification.requestPermission();
+    }
+</script>
+</body>
+</html>
