@@ -3,95 +3,248 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BidMaster Pro - Login</title>
-    <link rel="stylesheet" href="/src/styles/main.css">
+    <title>SmartBid - Online Auction Platform</title>
+    <link rel="stylesheet" href="styles/main.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-<div class="background-animation"></div>
-
-<div class="container">
-    <div class="auth-card">
-        <div class="card-header">
-            <div class="logo">
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
                 <i class="fas fa-gavel"></i>
-                <span>BidMaster</span>
+                <span>SmartBid</span>
             </div>
-            <h1 class="card-title">Welcome Back</h1>
-            <p class="card-subtitle">Sign in to your account to continue bidding</p>
+            <div class="nav-menu" id="navMenu">
+                <a href="#home" class="nav-link active" data-page="home">Home</a>
+                <a href="#auctions" class="nav-link" data-page="auctions">Auctions</a>
+                <a href="#dashboard" class="nav-link" data-page="dashboard">Dashboard</a>
+                <div class="nav-auth" id="navAuth">
+                    <button class="btn btn-outline" id="loginBtn">Login</button>
+                    <button class="btn btn-primary" id="registerBtn">Register</button>
+                </div>
+                <div class="nav-user" id="navUser" style="display: none;">
+                    <span id="userName">Welcome, User</span>
+                    <button class="btn btn-outline" id="logoutBtn">Logout</button>
+                </div>
+            </div>
+            <div class="nav-toggle" id="navToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
         </div>
+    </nav>
 
-        <div id="alertContainer"></div>
-
-        <form id="loginForm" class="auth-form">
-            <div class="form-group">
-                <label for="email" class="form-label">
-                    <i class="fas fa-envelope"></i>
-                    Email
-                </label>
-                <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        class="form-input"
-                        placeholder="Enter your email"
-                        required
-                >
-                <div class="form-error" id="emailError"></div>
-            </div>
-
-            <div class="form-group">
-                <label for="password" class="form-label">
-                    <i class="fas fa-lock"></i>
-                    Password
-                </label>
-                <div class="password-input-container">
-                    <input
-                            type="password"
-                            id="password"
-                            name="password"
-                            class="form-input"
-                            placeholder="Enter your password"
-                            required
-                    >
-                    <button type="button" class="password-toggle" id="passwordToggle">
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Home Page -->
+        <section id="home" class="page active">
+            <div class="hero">
+                <div class="hero-content">
+                    <h1>Welcome to SmartBid</h1>
+                    <p>Discover unique items and place your bids in real-time auctions</p>
+                    <div class="hero-stats">
+                        <div class="stat">
+                            <i class="fas fa-gavel"></i>
+                            <span id="activeAuctions">0</span>
+                            <label>Active Auctions</label>
+                        </div>
+                        <div class="stat">
+                            <i class="fas fa-users"></i>
+                            <span id="totalBidders">0</span>
+                            <label>Active Bidders</label>
+                        </div>
+                        <div class="stat">
+                            <i class="fas fa-trophy"></i>
+                            <span id="totalBids">0</span>
+                            <label>Total Bids</label>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-large" data-page="auctions">
                         <i class="fas fa-eye"></i>
+                        View Auctions
                     </button>
                 </div>
-                <div class="form-error" id="passwordError"></div>
             </div>
+        </section>
 
-            <div class="form-options">
-                <label class="checkbox-container">
-                    <input type="checkbox" id="rememberMe">
-                    <span class="checkmark"></span>
-                    Remember me
-                </label>
-            </div>
-
-            <button type="submit" class="btn btn-primary btn-full" id="loginBtn">
-                <span class="btn-text">Sign In</span>
-                <div class="btn-loader" id="loginLoader">
-                    <div class="spinner"></div>
+        <!-- Auctions Page -->
+        <section id="auctions" class="page">
+            <div class="page-header">
+                <h2>Live Auctions</h2>
+                <div class="page-controls">
+                    <button class="btn btn-outline" id="refreshAuctions">
+                        <i class="fas fa-sync-alt"></i>
+                        Refresh
+                    </button>
                 </div>
-            </button>
-        </form>
+            </div>
+            <div class="auctions-grid" id="auctionsGrid">
+                <!-- Auctions will be loaded here -->
+            </div>
+        </section>
 
-        <div class="auth-footer">
-            <p>Don't have an account?
-                <a href="/signup.html" class="auth-link">Create account</a>
-            </p>
+        <!-- Dashboard Page -->
+        <section id="dashboard" class="page">
+            <div class="page-header">
+                <h2>My Dashboard</h2>
+            </div>
+            <div class="dashboard-content">
+                <div class="dashboard-tabs">
+                    <button class="tab-btn active" data-tab="my-auctions">My Auctions</button>
+                    <button class="tab-btn" data-tab="my-bids">My Bids</button>
+                    <button class="tab-btn" data-tab="create-auction">Create Auction</button>
+                </div>
+                
+                <div class="tab-content">
+                    <div id="my-auctions" class="tab-pane active">
+                        <h3>My Auctions</h3>
+                        <div id="myAuctionsList">
+                            <!-- User's auctions will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <div id="my-bids" class="tab-pane">
+                        <h3>My Bids</h3>
+                        <div id="myBidsList">
+                            <!-- User's bids will be loaded here -->
+                        </div>
+                    </div>
+                    
+                    <div id="create-auction" class="tab-pane">
+                        <h3>Create New Auction</h3>
+                        <form id="createAuctionForm" class="auction-form">
+                            <div class="form-group">
+                                <label for="auctionTitle">Title</label>
+                                <input type="text" id="auctionTitle" name="title" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="auctionDescription">Description</label>
+                                <textarea id="auctionDescription" name="description" rows="4" required></textarea>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="basePrice">Starting Price</label>
+                                    <input type="number" id="basePrice" name="basePrice" step="0.01" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="minIncrement">Minimum Increment</label>
+                                    <input type="number" id="minIncrement" name="minIncrement" step="0.01" required>
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="startAt">Start Time</label>
+                                    <input type="datetime-local" id="startAt" name="startAt" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="endAt">End Time</label>
+                                    <input type="datetime-local" id="endAt" name="endAt" required>
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-plus"></i>
+                                Create Auction
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Login</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginUsername">Username</label>
+                    <input type="text" id="loginUsername" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" name="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">Login</button>
+            </form>
         </div>
+    </div>
 
-        <div class="card-footer">
-            <div class="security-notice">
-                <i class="fas fa-shield-alt"></i>
-                <span>Your data is securely encrypted</span>
+    <!-- Register Modal -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Register</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <form id="registerForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="regFirstName">First Name</label>
+                        <input type="text" id="regFirstName" name="firstName" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="regLastName">Last Name</label>
+                        <input type="text" id="regLastName" name="lastName" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="regUsername">Username</label>
+                    <input type="text" id="regUsername" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="regEmail">Email</label>
+                    <input type="email" id="regEmail" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="regPassword">Password</label>
+                    <input type="password" id="regPassword" name="password" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">Register</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Auction Detail Modal -->
+    <div id="auctionModal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3 id="auctionModalTitle">Auction Details</h3>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div id="auctionModalContent">
+                <!-- Auction details and bidding interface will be loaded here -->
             </div>
         </div>
     </div>
-</div>
 
-<script type="module" src="/src/js/auth/login.js"></script>
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay">
+        <div class="loading-spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Loading...</p>
+        </div>
+    </div>
+
+    <!-- Notification Toast -->
+    <div id="notification" class="notification">
+        <div class="notification-content">
+            <i class="fas fa-check-circle"></i>
+            <span id="notificationText">Success!</span>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/auctions.js"></script>
+    <script src="js/bidding.js"></script>
+    <script src="js/websocket.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>
