@@ -6,6 +6,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -31,12 +32,19 @@ public class User {
 
     private String firstName;
     private String lastName;
+    private String fullName;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
+
+    @ElementCollection(fetch = FetchType.EAGER)
+    @Enumerated(EnumType.STRING)
+    private Set<UserRole> roles;
+
+    public enum UserRole { BUYER, SELLER, ADMIN }
 
     // Default constructor
     public User() {
@@ -127,6 +135,22 @@ public class User {
         this.updatedAt = updatedAt;
     }
 
+    public Set<UserRole> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<UserRole> roles) {
+        this.roles = roles;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
     @Override
     public String toString() {
         return "User{" +
@@ -141,35 +165,3 @@ public class User {
     }
 }
 
-package com.pg24.bidding.auth.model;
-
-import jakarta.persistence.*;
-import java.util.Set;
-
-@Entity @Table(name = "users")
-public class User {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
-    @Column(unique = true, nullable = false) private String email;
-    @Column(nullable = false) private String password;
-    private String fullName;
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    @Enumerated(EnumType.STRING)
-    private Set<UserRole> roles;
-
-    public enum UserRole { BUYER, SELLER, ADMIN }
-
-    // getters/setters
-    public Long getId(){return id;}
-    public void setId(Long id){this.id=id;}
-    public String getEmail(){return email;}
-    public void setEmail(String email){this.email=email;}
-    public String getPassword(){return password;}
-    public void setPassword(String password){this.password=password;}
-    public String getFullName(){return fullName;}
-    public void setFullName(String fullName){this.fullName=fullName;}
-    public Set<UserRole> getRoles(){return roles;}
-    public void setRoles(Set<UserRole> roles){this.roles=roles;}
-}

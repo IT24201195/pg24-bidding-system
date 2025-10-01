@@ -48,4 +48,38 @@ public class AuctionService {
     public List<Auction> endedActiveAuctions() {
         return repo.findByStatusAndEndAtBefore(AuctionStatus.ACTIVE, LocalDateTime.now());
     }
+
+    // Finalization methods for AuctionFinalizationController
+    public void finalizeExpiredAuctions() {
+        // Simple implementation - just mark expired auctions as ended
+        List<Auction> expired = endedActiveAuctions();
+        for (Auction auction : expired) {
+            auction.setStatus(AuctionStatus.CLOSED);
+            repo.save(auction);
+        }
+    }
+
+    public Auction finalizeAuction(Long auctionId) {
+        Auction auction = get(auctionId);
+        auction.setStatus(AuctionStatus.CLOSED);
+        return repo.save(auction);
+    }
+
+    public Auction getAuctionResult(Long auctionId) {
+        return get(auctionId);
+    }
+
+    public List<Auction> getSellerClosedAuctions(Long sellerId) {
+        return List.of(); // Placeholder
+    }
+
+    public List<Auction> getBuyerWonAuctions(Long buyerId) {
+        return List.of(); // Placeholder
+    }
+
+    public Auction updateAuctionStatus(Long auctionId, String status) {
+        Auction auction = get(auctionId);
+        auction.setStatus(AuctionStatus.valueOf(status.toUpperCase()));
+        return repo.save(auction);
+    }
 }

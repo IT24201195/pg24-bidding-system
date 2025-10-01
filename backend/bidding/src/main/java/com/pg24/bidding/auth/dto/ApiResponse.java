@@ -1,4 +1,4 @@
-package com.bidding.dto;
+package com.pg24.bidding.auth.dto;
 
 public class ApiResponse<T> {
     private boolean success;

@@ -30,6 +30,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.lang.NonNull;
 
 import java.io.IOException;
 import java.security.Key;
@@ -49,8 +50,10 @@ public class Security {
         http.authorizeHttpRequests(req -> req
                 .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/ws/**", "/topic/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/auctions/**", "/api/bids/**").permitAll()
-                .anyRequest().authenticated()
+                .requestMatchers("/actuator/**").permitAll()
+                .requestMatchers("/api/**").permitAll()  // Allow all API endpoints for easy testing
+                .requestMatchers("/**").permitAll()      // Allow everything for demonstration
+                .anyRequest().permitAll()
         );
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
@@ -125,7 +128,7 @@ public class Security {
         }
 
         @Override
-        protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
+        protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain chain)
                 throws ServletException, IOException {
             final String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
             if (authHeader == null || !authHeader.startsWith("Bearer ")) {

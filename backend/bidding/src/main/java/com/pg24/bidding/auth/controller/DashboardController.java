@@ -1,6 +1,6 @@
 package com.pg24.bidding.auth.controller;
 
-import com.bidding.dto.ApiResponse;
+import com.pg24.bidding.auth.dto.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;

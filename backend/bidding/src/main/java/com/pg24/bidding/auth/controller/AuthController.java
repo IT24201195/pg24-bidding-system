@@ -1,14 +1,10 @@
 package com.pg24.bidding.auth.controller;
 
 import com.pg24.bidding.auth.dto.AuthDTOs.*;
-import com.pg24.bidding.auth.model.User.UserRole;
 import com.pg24.bidding.auth.service.AuthService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Set;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -31,7 +27,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest req) {
-        Authentication a = authManager.authenticate(
+        authManager.authenticate(
                 new UsernamePasswordAuthenticationToken(req.email(), req.password()));
         String token = auth.tokenFor(req.email());
         return ResponseEntity.ok(new AuthResponse(token));

@@ -1,4 +1,4 @@
-package com.bidding.dto;
+package com.pg24.bidding.auth.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
